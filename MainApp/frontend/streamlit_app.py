@@ -1,12 +1,13 @@
 import streamlit as st
-import sys
 from pathlib import Path
+import sys
 import os
-print("URL:",os.getenv("SUPABASE_URL"))
-print("KEY:",os.getenv("SUPAASE_ANON_KEY"))
-# Put the repo root on sys.path so `from frontend.views import ...` resolves
-# regardless of the directory streamlit was launched from.
-sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Add the repo root to sys.path so `from MainApp.xxx import yyy` resolves,
+# regardless of where Streamlit Cloud mounts the repo.
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from MainApp.frontend.services import supabase_client
 
 # Configure page
 st.set_page_config(
@@ -17,11 +18,10 @@ st.set_page_config(
 )
 
 # Auth state. Populated by Supabase sign-in / sign-up / OAuth.
-# All four are None when signed out, all four are set when signed in.
 for key, default in [
     ("access_token", None),
     ("refresh_token", None),
-    ("user_id", None),       # Supabase auth user id (uuid); also used by api_client
+    ("user_id", None),
     ("user_email", None),
     ("auth_error", None),
     ("auth_info", None),
@@ -29,16 +29,12 @@ for key, default in [
     if key not in st.session_state:
         st.session_state[key] = default
 
-# If we just came back from Google OAuth, Supabase appends `?code=<authcode>`
-# to the redirect URL. Exchange it for a session before rendering anything.
+# If we just came back from Google OAuth, exchange the code for a session.
 if (
     not st.session_state.access_token
     and "code" in st.query_params
 ):
-    from MainApp.frontend.services import supabase_client
     result = supabase_client.exchange_code_for_session(st.query_params["code"])
-
-    #Always clear the ?code= param so a refresh doesn't try to re-exchange.
     st.query_params.clear()
     if "error" in result:
         st.session_state.auth_error = f"Google sign-in failed: {result['error']}"
@@ -49,7 +45,7 @@ if (
         st.session_state.user_email    = result["email"]
         st.rerun()
 
-#Load custom CSS
+# Load custom CSS
 def load_css():
     try:
         css_path = Path(__file__).parent / 'assets' / 'styles.css'
@@ -67,30 +63,27 @@ if 'current_view' not in st.session_state:
 # Sidebar navigation
 with st.sidebar:
     st.markdown("## Navigation")
-    
+
     if st.button("🏠 Home", use_container_width=True):
         st.session_state.current_view = 'landing'
         st.rerun()
-    
+
     if st.button("🎯 ATS Scorer", use_container_width=True):
         st.session_state.current_view = 'scorer'
         st.rerun()
-    
+
     if st.button("📊 History", use_container_width=True):
         st.session_state.current_view = 'history'
         st.rerun()
-    
+
     if st.button("📚 Resources", use_container_width=True):
         st.session_state.current_view = 'resources'
         st.rerun()
-    
+
     st.markdown("---")
     st.markdown("### 👤 Account")
 
-    from MainApp.frontend.services import supabase_client
-
     if st.session_state.access_token:
-        # Signed-in state: show email + sign-out button.
         st.caption(f"Signed in as **{st.session_state.user_email}**")
         if st.button("Sign out", use_container_width=True):
             supabase_client.sign_out()
@@ -98,7 +91,6 @@ with st.sidebar:
                 st.session_state[k] = None
             st.rerun()
     else:
-        # Signed-out state: tabs for sign-in vs sign-up + Google OAuth button.
         if st.session_state.auth_error:
             st.error(st.session_state.auth_error)
             st.session_state.auth_error = None
@@ -159,21 +151,17 @@ with st.sidebar:
 
 # Main content area - render based on current view
 if st.session_state.current_view == 'landing':
-    # Import and render landing page
     from MainApp.frontend.views import landing
     landing.render()
 
 elif st.session_state.current_view == 'scorer':
-    # Import and render scorer page
     from MainApp.frontend.views import scorer
     scorer.render()
 
 elif st.session_state.current_view == 'history':
-    # Import and render history page
     from MainApp.frontend.views import history
     history.render()
 
 elif st.session_state.current_view == 'resources':
-    # Import and render resources page
     from MainApp.frontend.views import resources
     resources.render()
