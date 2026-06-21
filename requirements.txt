@@ -2,4 +2,5 @@ streamlit
 supabase
 requests
 python-dotenv
-spacy
+spacy ==3.8.14
+
