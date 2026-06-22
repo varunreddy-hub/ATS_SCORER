@@ -12,3 +12,5 @@ MainApp/datasets/
 MainApp/jupyternotebooks/
 .streamlit/secrets.toml
 
+MainApp/frontend/.streamlit/secrets.toml
+.env

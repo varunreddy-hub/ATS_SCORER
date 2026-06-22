@@ -1,7 +1,6 @@
 import re
 import spacy
 import numpy as np
-from sentence_transformers import SentenceTransformer
 from typing import Dict, List, Optional, Tuple
 
 from MainApp.backend.utils.file_utils import log_warning
@@ -72,7 +71,8 @@ def detect_location_info(text: str, nlp: spacy.Language) -> Dict:
         'penalty_applied':    penalty,
     }
 
-def _calculate_semantic_similarity(skill: str, text: str, embedder: SentenceTransformer) -> float:
+def _calculate_semantic_similarity(skill: str,text: str,embedder) -> float:
+
     #similarity = (A · B) / (|A| × |B|)
     if not skill or not text:
         return 0.0
@@ -89,7 +89,7 @@ def _calculate_semantic_similarity(skill: str, text: str, embedder: SentenceTran
         log_warning(f"Similarity error for '{skill}': {e}", context='ats_scorer')
         return 0.0
 
-def _skill_matches(skill: str, text: str, embedder: SentenceTransformer, threshold: float) -> Tuple[bool, float]:
+def _skill_matches(skill: str, text: str, embedder, threshold: float) -> Tuple[bool, float]:
 
     #fast, o(n) directly check if skill is a substring of the text (case-insensitive)
     if skill.lower() in text.lower():
@@ -104,7 +104,7 @@ def validate_skills_with_projects(
     skills: List[str],
     projects: List[Dict],
     experience_entries: List[Dict],
-    embedder: SentenceTransformer,
+    embedder,
     threshold: float = 0.6,
 ) -> Dict:
     

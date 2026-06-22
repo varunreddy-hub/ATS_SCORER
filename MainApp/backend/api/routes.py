@@ -2,7 +2,8 @@ import logging
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
-
+from sentence_transformers import SentenceTransformer
+from MainApp.backend.core.config import SENTENCE_TRANSFORMER_MODEL
 from MainApp.backend.api.auth import get_current_user
 from MainApp.backend.models.schemas import AnalysisResponse, ComponentScores, JDComparison, SkillValidationDetails
 from MainApp.backend.utils.file_utils import (
@@ -30,7 +31,17 @@ async def analyze_resume(
     warnings: List[str] = []
 
 
-    nlp      = request.app.state.nlp
+    nlp = request.app.state.nlp
+
+    if request.app.state.embedder is None:
+        logger.info(f"Loading SentenceTransformer: {SENTENCE_TRANSFORMER_MODEL}")
+
+        request.app.state.embedder = SentenceTransformer(
+            SENTENCE_TRANSFORMER_MODEL
+        )
+
+        logger.info("SentenceTransformer loaded successfully")
+
     embedder = request.app.state.embedder
 
 
@@ -123,11 +134,12 @@ async def analyze_resume(
 
 @router.get('/health')
 async def health_check(request: Request):
-    """Health check — confirms models are loaded and the API is ready."""
     return {
-        'status':          'healthy',
-        'nlp_loaded':      request.app.state.nlp is not None,
-        'embedder_loaded': request.app.state.embedder is not None,
+        "status": "healthy",
+        "nlp_loaded": request.app.state.nlp is not None,
+        "embedder_loaded": (
+            request.app.state.embedder is not None
+        ),
     }
 
 @router.get('/history')
