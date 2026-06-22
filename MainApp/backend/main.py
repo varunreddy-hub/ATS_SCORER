@@ -13,7 +13,7 @@ from core.config import (
     SPACY_MODEL_SECONDARY,
 )
 
-#from api.routes import router
+from api.routes import router
 
 logger = logging.getLogger("ats_resume_scorer")
 
@@ -74,7 +74,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#app.include_router(router)
+app.include_router(router)
 
 
 @app.get("/")
