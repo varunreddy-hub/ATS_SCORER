@@ -15,7 +15,6 @@ from core.config import (
 
 from api.routes import router
 
-
 logger = logging.getLogger("ats_resume_scorer")
 
 
@@ -47,31 +46,10 @@ async def lifespan(app: FastAPI):
             f"Successfully loaded fallback model {SPACY_MODEL_SECONDARY}"
         )
 
-    from sentence_transformers import SentenceTransformer
-    from core.config import SENTENCE_TRANSFORMER_MODEL
+    # SentenceTransformer will be loaded only when needed
+    app.state.embedder = None
 
-    try:
-        logger.info(
-        f"Loading SentenceTransformer model: {SENTENCE_TRANSFORMER_MODEL}"
-        )
-
-        app.state.embedder = SentenceTransformer(
-            SENTENCE_TRANSFORMER_MODEL,
-            device="cpu"
-        )
-
-        logger.info(
-            f"Successfully loaded {SENTENCE_TRANSFORMER_MODEL}"
-        )
-
-    except Exception as e:
-
-        logger.error(
-            f"Failed to load SentenceTransformer model: {e}"
-        )
-
-        app.state.embedder = None
-
+    logger.info("SentenceTransformer lazy loading enabled")
     logger.info("API startup completed.")
 
     yield
@@ -88,8 +66,6 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -99,7 +75,6 @@ app.add_middleware(
 )
 
 app.include_router(router)
-
 
 
 @app.get("/")
@@ -117,12 +92,13 @@ async def root():
         },
     }
 
+
 if __name__ == "__main__":
 
     import uvicorn
 
     uvicorn.run(
-        "MainApp.backend.main:app",
+        "main:app",
         host="0.0.0.0",
         port=8000,
         reload=True,
