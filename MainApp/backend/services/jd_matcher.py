@@ -3,7 +3,7 @@ import numpy as np
 import spacy
 from rapidfuzz import fuzz
 
-from MainApp.backend.utils.matching import (
+from utils.matching import (
     fuzzy_match_keywords,
     normalize_skill
 )
