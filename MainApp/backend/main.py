@@ -47,7 +47,30 @@ async def lifespan(app: FastAPI):
             f"Successfully loaded fallback model {SPACY_MODEL_SECONDARY}"
         )
 
-    app.state.embedder = None
+    from sentence_transformers import SentenceTransformer
+    from core.config import SENTENCE_TRANSFORMER_MODEL
+
+    try:
+        logger.info(
+        f"Loading SentenceTransformer model: {SENTENCE_TRANSFORMER_MODEL}"
+        )
+
+        app.state.embedder = SentenceTransformer(
+            SENTENCE_TRANSFORMER_MODEL,
+            device="cpu"
+        )
+
+        logger.info(
+            f"Successfully loaded {SENTENCE_TRANSFORMER_MODEL}"
+        )
+
+    except Exception as e:
+
+        logger.error(
+            f"Failed to load SentenceTransformer model: {e}"
+        )
+
+        app.state.embedder = None
 
     logger.info("API startup completed.")
 
