@@ -176,3 +176,40 @@
 2026-06-20 22:26:28,051 - INFO - Groq parsed skills count: 15
 2026-06-20 22:26:28,051 - INFO - Groq parsed experience count: 0
 2026-06-20 22:26:29,699 - WARNING - History save failed (non-blocking): cannot import name 'SUPABASE_KEY' from 'backend.core.config' (C:\Users\varun\OneDrive\Desktop\ATS_SCORER\backend\core\config.py)
+2026-06-23 11:46:26,573 - INFO - Starting ATS Resume Analyzer API...
+2026-06-23 11:46:28,877 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-23 11:46:28,877 - WARNING - en_core_web_sm not found. Falling back to en_core_web_sm
+2026-06-23 11:48:23,189 - INFO - Starting ATS Resume Analyzer API...
+2026-06-23 11:48:24,062 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-23 11:48:25,522 - INFO - Successfully loaded en_core_web_sm
+2026-06-23 11:48:25,522 - INFO - SentenceTransformer lazy loading enabled
+2026-06-23 11:48:25,522 - INFO - API startup completed.
+2026-06-23 18:14:34,111 - INFO - Starting ATS Resume Analyzer API...
+2026-06-23 18:14:38,281 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-23 18:14:39,306 - INFO - Successfully loaded en_core_web_sm
+2026-06-23 18:14:39,306 - INFO - SentenceTransformer lazy loading enabled
+2026-06-23 18:14:39,306 - INFO - API startup completed.
+2026-06-23 18:28:45,011 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-23 18:29:06,269 - INFO - Starting ATS Resume Analyzer API...
+2026-06-23 18:29:07,874 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-23 18:29:08,530 - INFO - Successfully loaded en_core_web_sm
+2026-06-23 18:29:08,530 - INFO - SentenceTransformer lazy loading enabled
+2026-06-23 18:29:08,530 - INFO - API startup completed.
+2026-06-23 18:29:08,648 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-23 18:29:23,209 - INFO - Starting ATS Resume Analyzer API...
+2026-06-23 18:29:25,115 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-23 18:29:26,056 - INFO - Successfully loaded en_core_web_sm
+2026-06-23 18:29:26,056 - INFO - SentenceTransformer lazy loading enabled
+2026-06-23 18:29:26,056 - INFO - API startup completed.
+2026-06-23 18:29:26,168 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-23 18:29:39,924 - INFO - Starting ATS Resume Analyzer API...
+2026-06-23 18:29:41,322 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-23 18:29:41,758 - INFO - Successfully loaded en_core_web_sm
+2026-06-23 18:29:41,758 - INFO - SentenceTransformer lazy loading enabled
+2026-06-23 18:29:41,758 - INFO - API startup completed.
+2026-06-23 18:29:41,867 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-23 18:29:57,162 - INFO - Starting ATS Resume Analyzer API...
+2026-06-23 18:29:58,330 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-23 18:29:58,852 - INFO - Successfully loaded en_core_web_sm
+2026-06-23 18:29:58,852 - INFO - SentenceTransformer lazy loading enabled
+2026-06-23 18:29:58,852 - INFO - API startup completed.

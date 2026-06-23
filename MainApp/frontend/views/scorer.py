@@ -2,8 +2,8 @@ from typing import Optional
 
 import requests
 import streamlit as st
-
-from MainApp.frontend.services import api_client
+st.error("This is the New Scorer.py")
+from MainApp.frontend.services.local_analyzer import analyze_resume_locally
 from MainApp.frontend.components.dashboard import display_results_dashboard
 
 
@@ -30,19 +30,7 @@ def _read_jd(jd_file, jd_text: str) -> str:
 
 
 def _show_backend_error(exc: Exception) -> None:
-    """Translate a `requests` exception into a friendly Streamlit error."""
-    if isinstance(exc, requests.ConnectionError):
-        st.error("Could not reach the backend. Is `uvicorn backend.main:app` running on port 8000?")
-    elif isinstance(exc, requests.Timeout):
-        st.error("The backend took too long to respond. Try a smaller resume or check the server logs.")
-    elif isinstance(exc, requests.HTTPError) and exc.response is not None:
-        try:
-            detail = exc.response.json().get("detail", exc.response.text)
-        except ValueError:
-            detail = exc.response.text
-        st.error(f"Backend returned {exc.response.status_code}: {detail}")
-    else:
-        st.error(f"Unexpected error: {exc}")
+    st.error(f"REAL ERROR: {exc}")
 
 
 def _summary_text(analysis: dict) -> str:
@@ -209,13 +197,15 @@ def render() -> None:
 
     try:
         with st.spinner("Analyzing your resume... this can take 10–30 seconds."):
-            analysis = api_client.analyze_resume(
+            analysis = analyze_resume_locally(
                 resume_file=resume_file,
-                access_token=access_token,
                 job_description=job_description,
             )
-    except requests.RequestException as exc:
-        _show_backend_error(exc)
+
+    except Exception as exc:
+        import traceback
+        st.error(str(exc))
+        st.code(traceback.format_exc())
         return
 
     st.session_state["scorer_analysis"] = analysis
