@@ -107,32 +107,20 @@ def _render_upload_area(analysis_mode: str):
     return resume_file, jd_file, jd_text
 
 
-def _render_export_buttons(analysis: dict) -> None:
+def _render_export_buttons(analysis) -> None:
+    import json
     st.markdown("### 📥 Export Results")
     c1, c2 = st.columns(2)
 
     with c1:
-        # Lazy: only call the backend the first time the user clicks expand.
-        if st.button("📑 Generate PDF Report", use_container_width=True, type="primary"):
-            try:
-                with st.spinner("Generating PDF on backend..."):
-                    pdf_bytes = api_client.generate_pdf(
-                        analysis,
-                        access_token=st.session_state["access_token"],
-                    )
-                st.session_state["scorer_pdf_bytes"] = pdf_bytes
-            except requests.RequestException as exc:
-                _show_backend_error(exc)
-
-        if "scorer_pdf_bytes" in st.session_state:
-            st.download_button(
-                "⬇️ Download PDF",
-                data=st.session_state["scorer_pdf_bytes"],
-                file_name="ats_resume_report.pdf",
-                mime="application/pdf",
-                use_container_width=True,
-                key="download_pdf_report",
-            )
+        st.download_button(
+            "📥 Download Results (JSON)",
+            data=json.dumps(analysis if isinstance(analysis, dict) else analysis.dict(), indent=2),
+            file_name="ats_results.json",
+            mime="application/json",
+            use_container_width=True,
+            key="download_json",
+        )
 
     with c2:
         st.download_button(
