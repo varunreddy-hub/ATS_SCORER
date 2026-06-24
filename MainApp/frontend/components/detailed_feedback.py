@@ -7,24 +7,29 @@ from MainApp.frontend.components._helpers import get_severity_style
 
 SEVERITY_ORDER = ["critical", "high", "medium", "low"]
 
+def _get(issue, key, default=None):
+    if isinstance(issue, dict):
+        return issue.get(key, default)
+    return getattr(issue, key, default)
+
 
 def _group_by_severity(issues: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
     grouped: Dict[str, List[Dict[str, Any]]] = {level: [] for level in SEVERITY_ORDER}
     for issue in issues:
-        level = (issue.get("severity_level") or "low").lower()
+        level = (_get(issue, "severity_level") or "low").lower()
         grouped.setdefault(level, []).append(issue)
     return grouped
 
 
 def _render_issue(issue: Dict[str, Any]) -> None:
-    icon, text_color, bg_color = get_severity_style(issue.get("severity_level"))
-    title = issue.get("issue_title", "Untitled issue")
-    impact = issue.get("ats_impact", "")
-    explanation = issue.get("explanation", "")
-    where = issue.get("where_it_appears", "")
-    how_to_fix = issue.get("how_to_fix", "")
-    action_items = issue.get("action_items") or []
-    example = issue.get("example_improvement", "")
+    icon, text_color, bg_color = get_severity_style(_get(issue, "severity_level"))
+    title = _get(issue, "issue_title", "Untitled issue")
+    impact = _get(issue, "ats_impact", "")
+    explanation = _get(issue, "explanation", "")
+    where = _get(issue, "where_it_appears", "")
+    how_to_fix = _get(issue, "how_to_fix", "")
+    action_items = _get(issue, "action_items") or []
+    example = _get(issue, "example_improvement", "")
 
     st.markdown(
         f"""
