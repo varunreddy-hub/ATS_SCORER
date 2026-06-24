@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timezone
 from typing import List, Optional, Dict
 import streamlit as st
+import os
 
 logger = logging.getLogger('ats_resume_scorer')
 
@@ -16,7 +17,30 @@ def _get_supabase_config():
         url = os.environ.get("SUPABASE_URL", "")
         key = os.environ.get("SUPABASE_KEY", "")
     return url, key
-
+def google_oauth_url() -> dict:
+    url, key = _get_supabase_config()
+    if not url or not key:
+        return {"error": "Supabase not configured"}
+    
+    try:
+        response = httpx.post(
+            f"{url.rstrip('/')}/auth/v1/authorize",
+            headers={
+                "apikey": key,
+                "Content-Type": "application/json"
+            },
+            json={
+                "provider": "google",
+                "options": {
+                    "redirect_to": os.environ.get("AUTH_REDIRECT_URL", "http://localhost:8501")
+                }
+            }
+        )
+        data = response.json()
+        return {"url": data.get("url", "")}
+    except Exception as exc:
+        logger.error(f"OAuth URL error: {exc}")
+        return {"error": str(exc)}
 def _get_headers():
     url, key = _get_supabase_config()
     if not url or not key:
