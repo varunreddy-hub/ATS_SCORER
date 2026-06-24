@@ -9,7 +9,7 @@ SEVERITY_ORDER = ["critical", "high", "medium", "low"]
 
 def _get(issue, key, default=None):
     if isinstance(issue, dict):
-        return _get(analysis(key, default)
+        return issue.get(key, default)
     return getattr(issue, key, default)
 
 
