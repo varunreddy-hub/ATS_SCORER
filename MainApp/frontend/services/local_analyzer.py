@@ -17,17 +17,17 @@ embedder = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def analyze_resume_locally(resume_file, job_description=""):
-    st.error("LOCAL ANALYZER STARTED")
+    #st.error("LOCAL ANALYZER STARTED")
 
     file_bytes = resume_file.getvalue()
     filename = resume_file.name
-    st.error("PARSING RESUME")
+    #st.error("PARSING RESUME")
     resume_text, _ = parse_resume_file(
         file_bytes,
         filename
     )
 
-    st.error("CALLING analyze_full_resume")
+    #st.error("CALLING analyze_full_resume")
 
     result = analyze_full_resume(
         resume_text=resume_text,
