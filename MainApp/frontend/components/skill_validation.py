@@ -2,6 +2,10 @@ from typing import Any, Dict
 
 import streamlit as st
 
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
 
 def display_skill_validation(analysis: Dict[str, Any]) -> None:
     details = _get(analysis, "skill_validation_details") or {}

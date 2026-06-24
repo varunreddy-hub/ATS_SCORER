@@ -7,6 +7,11 @@ from MainApp.frontend.services.local_analyzer import analyze_resume_locally
 from MainApp.frontend.components.dashboard import display_results_dashboard
 
 
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
 def _read_jd(jd_file, jd_text: str) -> str:
     """
     Turn whatever the user provided into a plain JD string for the backend.

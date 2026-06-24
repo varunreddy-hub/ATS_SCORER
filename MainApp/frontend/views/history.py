@@ -3,6 +3,10 @@ import streamlit as st
 
 from MainApp.frontend.services import api_client
 
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
 
 def _show_backend_error(exc: Exception) -> None:
     if isinstance(exc, requests.ConnectionError):

@@ -2,6 +2,10 @@ from typing import Any, Dict, Optional
 
 import streamlit as st
 
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
 
 def display_jd_comparison(jd_comparison: Optional[Dict[str, Any]]) -> None:
     if not jd_comparison:
