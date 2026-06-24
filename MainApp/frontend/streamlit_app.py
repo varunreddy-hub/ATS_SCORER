@@ -35,6 +35,23 @@ def _extract_user(result):
         email = getattr(user, "email", "")
     return uid, email
 
+# Handle OAuth token in URL fragment (Supabase implicit flow)
+if not st.session_state.access_token:
+    # Check for access_token in query params (Streamlit converts # to ?)
+    token = st.query_params.get("access_token")
+    refresh = st.query_params.get("refresh_token")
+    if token:
+        st.query_params.clear()
+        result = supabase_client.get_user(token)
+        if "error" not in result:
+            st.session_state.access_token = token
+            st.session_state.refresh_token = refresh
+            uid, email = _extract_user(result)
+            st.session_state.user_id = uid
+            st.session_state.user_email = email
+            st.rerun()
+
+            
 if not st.session_state.access_token and "code" in st.query_params:
     result = supabase_client.exchange_code_for_session(st.query_params["code"])
     st.query_params.clear()
