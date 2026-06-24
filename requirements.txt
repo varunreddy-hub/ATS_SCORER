@@ -2,14 +2,11 @@ streamlit
 supabase
 requests
 python-dotenv
-spacy ==3.8.13
+spacy==3.8.13
 
 sentence-transformers
 transformers
 torch
-
-
-python-magic
 pdfplumber
 python-docx
 PyPDF2
