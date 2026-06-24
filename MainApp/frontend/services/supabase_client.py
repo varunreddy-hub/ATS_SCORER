@@ -37,7 +37,12 @@ def google_oauth_url() -> dict:
         return {"error": "Supabase not configured"}
     try:
         redirect = os.environ.get("AUTH_REDIRECT_URL", "http://localhost:8501")
-        auth_url = f"{url.rstrip('/')}/auth/v1/authorize?provider=google&redirect_to={redirect}"
+        auth_url = (
+            f"{url.rstrip('/')}/auth/v1/authorize"
+            f"?provider=google"
+            f"&redirect_to={redirect}"
+            f"&flow_type=pkce"
+        )
         return {"url": auth_url}
     except Exception as exc:
         return {"error": str(exc)}
