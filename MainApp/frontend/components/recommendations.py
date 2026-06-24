@@ -4,7 +4,7 @@ import streamlit as st
 
 
 def display_recommendations(analysis: Dict[str, Any]) -> None:
-    suggestions = analysis.get("suggestions") or []
+    suggestions = _get(analysis, "suggestions") or []
     if not suggestions:
         return
 

@@ -193,9 +193,9 @@ def generate_keyword_recommendations(
     recommendations = []
 
     if keyword_analysis:
-        missing   = keyword_analysis.get('missing_keywords', [])
-        gap       = keyword_analysis.get('skills_gap', [])
-        match_pct = keyword_analysis.get('match_percentage', 0.0)
+        missing   = keyword__get(analysis,('missing_keywords', [])
+        gap       = keyword__get(analysis,('skills_gap', [])
+        match_pct = keyword__get(analysis,('match_percentage', 0.0)
 
         if missing:
             if match_pct < 40:

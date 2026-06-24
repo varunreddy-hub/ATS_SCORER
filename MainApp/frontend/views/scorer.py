@@ -35,17 +35,17 @@ def _show_backend_error(exc: Exception) -> None:
 
 def _summary_text(analysis: dict) -> str:
     """Tiny client-side text summary for the Download button."""
-    score = analysis.get("ATS_score", analysis.get("ats_score", 0))
+    score = _get(analysis,("ATS_score", _get(analysis,("ats_score", 0))
     lines = [f"ATS Score: {score:.0f}/100", ""]
-    if analysis.get("strengths"):
+    if _get(analysis,("strengths"):
         lines.append("STRENGTHS:")
         lines.extend(f"  - {s}" for s in analysis["strengths"])
         lines.append("")
-    if analysis.get("critical_issues"):
+    if _get(analysis,("critical_issues"):
         lines.append("CRITICAL ISSUES:")
         lines.extend(f"  - {s}" for s in analysis["critical_issues"])
         lines.append("")
-    if analysis.get("suggestions"):
+    if _get(analysis,("suggestions"):
         lines.append("SUGGESTIONS:")
         lines.extend(f"  - {s}" for s in analysis["suggestions"])
     return "\n".join(lines)

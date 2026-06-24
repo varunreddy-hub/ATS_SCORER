@@ -4,7 +4,7 @@ import streamlit as st
 
 
 def display_skill_validation(analysis: Dict[str, Any]) -> None:
-    details = analysis.get("skill_validation_details") or {}
+    details = _get(analysis, "skill_validation_details") or {}
     validated = details.get("validated", [])
     unvalidated = details.get("unvalidated", [])
     total = details.get("total", len(validated) + len(unvalidated))

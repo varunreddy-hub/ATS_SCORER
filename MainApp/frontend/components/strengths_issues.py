@@ -12,8 +12,8 @@ def display_strengths(strengths: List[str]) -> None:
 
 
 def display_critical_issues(analysis: Dict[str, Any]) -> None:
-    critical = analysis.get("critical_issues") or []
-    summary = analysis.get("issues_summary") or []
+    critical = _get(analysis,"critical_issues") or []
+    summary = _get(analysis,"issues_summary") or []
 
     if not critical and not summary:
         st.success("### ✅ No Critical Issues Found!")

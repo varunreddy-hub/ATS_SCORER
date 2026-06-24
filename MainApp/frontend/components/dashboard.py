@@ -10,6 +10,10 @@ from MainApp.frontend.components.detailed_feedback import display_detailed_feedb
 from MainApp.frontend.components.action_items import display_action_items
 from MainApp.frontend.components.recommendations import display_recommendations
 
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
 
 def display_results_dashboard(analysis: Dict[str, Any]) -> None:
     """
@@ -25,7 +29,7 @@ def display_results_dashboard(analysis: Dict[str, Any]) -> None:
     display_score_breakdown(analysis)
     st.markdown("---")
 
-    display_strengths(analysis.get("strengths") or [])
+    display_strengths(_get(analysis, "strengths") or [])
     st.markdown("---")
 
     display_critical_issues(analysis)
@@ -35,7 +39,7 @@ def display_results_dashboard(analysis: Dict[str, Any]) -> None:
     st.markdown("---")
 
     # JD comparison only shows up if the user actually submitted a JD.
-    jd_comparison = analysis.get("jd_comparison") or analysis.get("jd_match_analysis")
+    jd_comparison = _get(analysis, "jd_comparison") or _get(analysis, "jd_match_analysis")
     if jd_comparison:
         display_jd_comparison(jd_comparison)
         st.markdown("---")

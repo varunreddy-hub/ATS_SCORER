@@ -9,7 +9,7 @@ SEVERITY_ORDER = ["critical", "high", "medium", "low"]
 
 def _get(issue, key, default=None):
     if isinstance(issue, dict):
-        return issue.get(key, default)
+        return _get(analysis(key, default)
     return getattr(issue, key, default)
 
 
@@ -59,7 +59,7 @@ def _render_issue(issue: Dict[str, Any]) -> None:
 
 
 def display_detailed_feedback(analysis: Dict[str, Any]) -> None:
-    issues = analysis.get("detailed_feedback") or []
+    issues = _get(analysis,"detailed_feedback") or []
     if not issues:
         return  # backend produced no per-issue feedback this run
 

@@ -18,8 +18,8 @@ COMPONENTS = [
 
 def display_overall_score(analysis: Dict[str, Any]) -> None:
     """Big colored score card with a short interpretation line."""
-    score = float(analysis.get("ATS_score", analysis.get("ats_score", 0)))
-    interpretation = analysis.get("interpretation", "")
+    score = float(_get(analysis,"ATS_score", _get(analysis,("ats_score", 0))))
+    interpretation = _get(analysis,"interpretation", "")
     text_color, bg_color = get_score_color(score)
     emoji = get_score_emoji(score)
 
@@ -43,7 +43,7 @@ def display_overall_score(analysis: Dict[str, Any]) -> None:
 
 def display_score_breakdown(analysis: Dict[str, Any]) -> None:
     """Five progress bars, one per scoring component."""
-    component_scores = analysis.get("component_scores") or {}
+    component_scores = _get(analysis, "component_scores") or {}
     st.markdown("### 📈 Score Breakdown")
 
     left, right = st.columns(2)
