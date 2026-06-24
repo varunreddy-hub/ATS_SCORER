@@ -44,8 +44,8 @@ def render() -> None:
         created_at = entry.get("created_at", "")
         analysis = entry.get("analysis_result", {}) or {}
 
-        component_scores = _get(analysis,("component_scores", {}) or {}
-        jd_comparison = _get(analysis,("jd_comparison") or _get(analysis,("jd_match_analysis")
+        component_scores = _get(analysis, "component_scores", {}) or {}
+        jd_comparison = _get(analysis, "jd_comparison") or _get(analysis, "jd_match_analysis")
 
         with st.expander(f"📄 {filename} — Score: {ats_score:.0f}/100 — {created_at}"):
             c1, c2, c3 = st.columns(3)

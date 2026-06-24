@@ -1,6 +1,10 @@
 from typing import Any, Dict, List
 import streamlit as st
 
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
 
 def display_strengths(strengths: List[str]) -> None:
     st.markdown("### 💪 Strengths")
