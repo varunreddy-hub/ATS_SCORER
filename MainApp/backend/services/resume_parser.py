@@ -6,7 +6,7 @@ import pdfplumber
 from docx import Document
 import PyPDF2
 
-from utils.file_utils import(
+from MainApp.backend.utils.file_utils import(
     FileParsingError, 
     TextExtractionError, 
     FileUploadError, 
@@ -16,7 +16,7 @@ from utils.file_utils import(
     with_fallback
 )
 
-from core.config import (
+from MainApp.backend.core.config import (
     MAX_FILE_SIZE_BYTES,
     MAX_FILE_SIZE_MB, 
     SUPPORTED_MIME_TYPES
