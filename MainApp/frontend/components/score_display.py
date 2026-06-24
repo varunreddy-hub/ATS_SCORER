@@ -5,8 +5,12 @@ import streamlit as st
 from MainApp.frontend.components._helpers import get_score_color, get_score_emoji
 
 
-# Component max scores match backend/core/config.py SCORE_WEIGHTS.
-# (Backend returns each component's score on its own scale, not 0–100.)
+def _get(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
+
 COMPONENTS = [
     ("Formatting",        "formatting",        20, "📝"),
     ("Keywords & Skills", "keywords",          25, "🔑"),
@@ -17,9 +21,8 @@ COMPONENTS = [
 
 
 def display_overall_score(analysis: Dict[str, Any]) -> None:
-    """Big colored score card with a short interpretation line."""
-    score = float(_get(analysis,"ATS_score", _get(analysis,("ats_score", 0))))
-    interpretation = _get(analysis,"interpretation", "")
+    score = float(_get(analysis, "ATS_score") or _get(analysis, "ats_score") or 0)
+    interpretation = _get(analysis, "interpretation", "")
     text_color, bg_color = get_score_color(score)
     emoji = get_score_emoji(score)
 
@@ -48,7 +51,7 @@ def display_score_breakdown(analysis: Dict[str, Any]) -> None:
 
     left, right = st.columns(2)
     for i, (label, key, max_score, icon) in enumerate(COMPONENTS):
-        value = float(component_scores.get(key, 0))
+        value = float(_get(component_scores, key, 0) or 0)
         percentage = value / max_score if max_score else 0
         bar_color = "green" if percentage >= 0.8 else "orange" if percentage >= 0.6 else "red"
 
