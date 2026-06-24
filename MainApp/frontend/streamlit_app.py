@@ -159,11 +159,17 @@ with st.sidebar:
                     unsafe_allow_html=True)
 
         oauth = supabase_client.google_oauth_url()
-       
-        if "error" in oauth:
-            st.caption(f"Google sign-in unavailable: {oauth['error']}")
+
+        st.write("OAuth object:", oauth)
+
+        if oauth is None:
+                st.error("google_oauth_url() returned None")
+
+        elif "error" in oauth:
+            st.error(oauth["error"])
+
         else:
-            st.write(oauth["url"])
+            st.write("OAuth URL:", oauth["url"])
 
 if st.session_state.current_view == 'landing':
     from MainApp.frontend.views import landing
