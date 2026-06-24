@@ -296,3 +296,14 @@
 2026-06-24 22:29:01,640 - INFO - SentenceTransformer lazy loading enabled
 2026-06-24 22:29:01,640 - INFO - API startup completed.
 2026-06-24 22:40:17,174 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-24 22:41:39,355 - INFO - Starting ATS Resume Analyzer API...
+2026-06-24 22:41:41,665 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-24 22:41:42,529 - INFO - Successfully loaded en_core_web_sm
+2026-06-24 22:41:42,529 - INFO - SentenceTransformer lazy loading enabled
+2026-06-24 22:41:42,529 - INFO - API startup completed.
+2026-06-24 22:44:11,918 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-24 22:44:25,166 - INFO - Starting ATS Resume Analyzer API...
+2026-06-24 22:44:25,840 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-24 22:44:26,188 - INFO - Successfully loaded en_core_web_sm
+2026-06-24 22:44:26,188 - INFO - SentenceTransformer lazy loading enabled
+2026-06-24 22:44:26,188 - INFO - API startup completed.

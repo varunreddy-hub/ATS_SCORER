@@ -31,20 +31,21 @@ def _get_headers():
     }
     return url, headers
 
-def google_oauth_url() -> dict:
+def google_oauth_url():
     url, key = _get_supabase_config()
-    if not url or not key:
-        return {"error": "Supabase not configured"}
-    try:
-        redirect = os.environ.get("AUTH_REDIRECT_URL", "http://localhost:8501")
-        auth_url = (
-            f"{url.rstrip('/')}/auth/v1/authorize"
-            f"?provider=google"
-            f"&redirect_to={redirect}"
-        )
-        return {"url": auth_url}
-    except Exception as exc:
-        return {"error": str(exc)}
+
+    redirect = os.environ.get(
+        "AUTH_REDIRECT_URL",
+        "https://atsscorer-k9xrzsqzqqkuvtgph4wiqp.streamlit.app"
+    )
+
+    return {
+        "url":
+        f"{url}/auth/v1/authorize"
+        f"?provider=google"
+        f"&redirect_to={redirect}"
+        f"&flow_type=pkce"
+    }
 
 def sign_in_with_password(email: str, password: str) -> dict:
     url, key = _get_supabase_config()
