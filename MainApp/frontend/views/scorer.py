@@ -38,21 +38,29 @@ def _show_backend_error(exc: Exception) -> None:
     st.error(f"REAL ERROR: {exc}")
 
 
-def _summary_text(analysis: dict) -> str:
-    """Tiny client-side text summary for the Download button."""
-    score = _get(analysis, "ATS_score", _get(analysis, "ats_score", 0))
-    lines = [f"ATS Score: {score:.0f}/100", ""]
-    if _get(analysis,"strengths"):
-        lines.append("STRENGTHS:")
-        lines.extend(f"  - {s}" for s in analysis["strengths"])
-        lines.append("")
-    if _get(analysis, "critical_issues"):
-        lines.append("CRITICAL ISSUES:")
-        lines.extend(f"  - {s}" for s in analysis["critical_issues"])
-        lines.append("")
-    if _get(analysis, "suggestions"):
-        lines.append("SUGGESTIONS:")
-        lines.extend(f"  - {s}" for s in analysis["suggestions"])
+def _summary_text(analysis) -> str:
+    def _get(obj, key, default=None):
+        if isinstance(obj, dict):
+            return obj.get(key, default)
+        return getattr(obj, key, default)
+
+    score = _get(analysis, "ATS_score") or _get(analysis, "ats_score") or 0
+    interpretation = _get(analysis, "interpretation", "")
+    issues = _get(analysis, "detailed_feedback") or []
+
+    lines = [
+        "ATS RESUME SCORER - RESULTS",
+        "=" * 40,
+        f"Overall Score: {score}",
+        f"Interpretation: {interpretation}",
+        "",
+        "ISSUES FOUND:",
+    ]
+    for issue in issues:
+        title = _get(issue, "issue_title", "")
+        level = _get(issue, "severity_level", "")
+        lines.append(f"- [{level.upper()}] {title}")
+
     return "\n".join(lines)
 
 
