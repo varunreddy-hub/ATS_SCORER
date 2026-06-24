@@ -2,7 +2,7 @@ import requests
 import streamlit as st
 
 from MainApp.frontend.services import api_client
-
+from MainApp.frontend.services.supabase_client import get_user_history, delete_analysis
 def _get(obj, key, default=None):
     if isinstance(obj, dict):
         return obj.get(key, default)

@@ -211,5 +211,11 @@ def render() -> None:
 
     st.session_state["scorer_analysis"] = analysis
     st.success("✅ Analysis complete!")
+    from MainApp.frontend.services.supabase_client import save_analysis
+    save_analysis(
+        user_id=st.session_state.get("user_id", ""),
+        filename=resume_file.name,
+        analysis_result=analysis if isinstance(analysis, dict) else analysis.model_dump()
+        )
     display_results_dashboard(analysis)
     _render_export_buttons(analysis)

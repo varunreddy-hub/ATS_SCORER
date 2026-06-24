@@ -1,151 +1,122 @@
-import os
+import httpx
+import json
 import logging
-from pathlib import Path
-from typing import Any, Dict
+from datetime import datetime, timezone
+from typing import List, Optional, Dict
 import streamlit as st
-from supabase import Client, create_client
 
 logger = logging.getLogger('ats_resume_scorer')
 
-
-try:
-    from dotenv import load_dotenv
-    load_dotenv(Path(__file__).resolve().parents[2] / '.env')
-except ImportError:
-    pass
-env_path = Path(__file__).resolve().parents[2] / '.env'
-logger.info(f'Loading .env from: {env_path} | exists: {env_path.exists()}')
-
-def _secret(key: str, section: str = 'supabase') -> str:
-    """Read from env first, then fall back to st.secrets[section][key]."""
-
-    val = os.getenv(key, '')
-    if val:
-        return val
+def _get_supabase_config():
     try:
-        return st.secrets[section][key]
-    except (KeyError, FileNotFoundError, AttributeError):
-        return ''
+        url = st.secrets["SUPABASE_URL"]
+        key = st.secrets["SUPABASE_KEY"]
+    except:
+        import os
+        url = os.environ.get("SUPABASE_URL", "")
+        key = os.environ.get("SUPABASE_KEY", "")
+    return url, key
 
+def _get_headers():
+    url, key = _get_supabase_config()
+    if not url or not key:
+        return None, None
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+    }
+    return url, headers
 
-SUPABASE_URL = _secret('SUPABASE_URL')
-SUPABASE_ANON_KEY = _secret('SUPABASE_ANON_KEY')
-
-OAUTH_REDIRECT_URL = (
-    os.getenv('AUTH_REDIRECT_URL')
-    or _secret('redirect_uri', 'google_oauth')
-    or 'http://localhost:8501'
-)
-
-
-def _missing_config() -> str | None:
-    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
-        return 'Supabase is not configured — set SUPABASE_URL and SUPABASE_ANON_KEY in .env or .streamlit/secrets.toml'
-    return None
-
-
-@st.cache_resource
-def get_client() -> Client | None:
-    """Cached singleton — preserves PKCE state across Streamlit reruns."""
-    if _missing_config():
+def save_analysis(user_id: str, filename: str, analysis_result: Dict) -> Optional[str]:
+    url, headers = _get_headers()
+    if not headers:
         return None
-    return create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+    def _json_default(o):
+        if hasattr(o, 'model_dump'):
+            return o.model_dump()
+        return str(o)
 
-def _session_dict(session, user) -> Dict[str, Any]:
-    return {
-        'access_token':  session.access_token,
-        'refresh_token': session.refresh_token,
-        'user_id':       user.id,
-        'email':         user.email,
+    serializable_result = json.loads(json.dumps(analysis_result, default=_json_default))
+
+    doc = {
+        "user_id": user_id,
+        "filename": filename,
+        "ats_score": serializable_result.get("ATS_score") or serializable_result.get("ats_score") or 0,
+        "keyword_match": serializable_result.get("keyword_match", 0),
+        "missing_keywords": serializable_result.get("missing_keywords", []),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "analysis_result": serializable_result,
     }
 
-
-def sign_in_with_password(email: str, password: str) -> Dict[str, Any]:
-    err = _missing_config()
-    if err:
-        return {'error': err}
     try:
-        resp = get_client().auth.sign_in_with_password(
-            {'email': email, 'password': password}
+        response = httpx.post(
+            f"{url.rstrip('/')}/rest/v1/analyses",
+            headers=headers,
+            json=doc
         )
-        if not resp.session or not resp.user:
-            return {'error': 'Invalid credentials'}
-        return _session_dict(resp.session, resp.user)
+        response.raise_for_status()
+        data = response.json()
+        if data and len(data) > 0:
+            return str(data[0].get("id"))
+        return None
     except Exception as exc:
-        logger.warning(f'sign_in_with_password failed: {exc}')
-        return {'error': _humanize(exc)}
+        logger.error(f"Failed to save analysis: {exc}")
+        return None
 
+def get_user_history(user_id: str) -> List[Dict]:
+    url, headers = _get_headers()
+    if not headers:
+        return []
 
-def sign_up_with_password(email: str, password: str) -> Dict[str, Any]:
-    err = _missing_config()
-    if err:
-        return {'error': err}
     try:
-        resp = get_client().auth.sign_up({'email': email, 'password': password})
-        if resp.session and resp.user:
-            return _session_dict(resp.session, resp.user)
-        if resp.user:
-            return {'pending_confirmation': True, 'email': email}
-        return {'error': 'Sign-up failed'}
+        response = httpx.get(
+            f"{url.rstrip('/')}/rest/v1/analyses",
+            headers=headers,
+            params={
+                "user_id": f"eq.{user_id}",
+                "order": "created_at.desc"
+            }
+        )
+        response.raise_for_status()
+        docs = response.json()
+
+        results = []
+        for doc in docs:
+            results.append({
+                "id": str(doc.get("id")),
+                "filename": doc.get("filename", "resume"),
+                "resume_name": doc.get("filename", "resume"),
+                "ats_score": doc.get("ats_score", 0),
+                "keyword_match": doc.get("keyword_match", 0),
+                "missing_keywords": doc.get("missing_keywords", []),
+                "date": doc.get("created_at", ""),
+                "created_at": doc.get("created_at", ""),
+                "analysis_result": doc.get("analysis_result", {}),
+            })
+        return results
     except Exception as exc:
-        logger.warning(f'sign_up failed: {exc}')
-        return {'error': _humanize(exc)}
+        logger.error(f"Failed to fetch history: {exc}")
+        return []
 
+def delete_analysis(analysis_id: str, user_id: str) -> bool:
+    url, headers = _get_headers()
+    if not headers:
+        return False
 
-def google_oauth_url() -> Dict[str, Any]:
-    err = _missing_config()
-    if err:
-        return {'error': err}
     try:
-        resp = get_client().auth.sign_in_with_oauth({
-            'provider': 'google',
-            'options': {'redirect_to': OAUTH_REDIRECT_URL},
-        })
-        return {'url': resp.url}
+        response = httpx.delete(
+            f"{url.rstrip('/')}/rest/v1/analyses",
+            headers=headers,
+            params={
+                "id": f"eq.{analysis_id}",
+                "user_id": f"eq.{user_id}"
+            }
+        )
+        response.raise_for_status()
+        return True
     except Exception as exc:
-        logger.warning(f'oauth url generation failed: {exc}')
-        return {'error': _humanize(exc)}
-
-
-def exchange_code_for_session(auth_code: str) -> Dict[str, Any]:
-    """Called once after the OAuth provider redirects back with `?code=...`."""
-    err = _missing_config()
-    if err:
-        return {'error': err}
-    client = get_client()
-    try:
-        storage_key = f'{client.auth._storage_key}-code-verifier'
-        code_verifier = client.auth._storage.get_item(storage_key) or ''
-        resp = client.auth.exchange_code_for_session({
-            'auth_code': auth_code,
-            'code_verifier': code_verifier,
-            'redirect_to': OAUTH_REDIRECT_URL,
-        })
-        if not resp.session or not resp.user:
-            return {'error': 'OAuth exchange returned no session'}
-        return _session_dict(resp.session, resp.user)
-    except Exception as exc:
-        logger.warning(f'exchange_code_for_session failed: {exc}')
-        return {'error': _humanize(exc)}
-
-
-def sign_out() -> None:
-    if _missing_config():
-        return
-    try:
-        get_client().auth.sign_out()
-    except Exception as exc:
-        logger.warning(f'sign_out failed: {exc}')
-
-
-def _humanize(exc: Exception) -> str:
-    msg = str(exc)
-    # supabase errors arrive as "<status>: {json blob}" — surface the human bit
-    if 'invalid_grant' in msg.lower() or 'invalid login' in msg.lower():
-        return 'Wrong email or password'
-    if 'user already registered' in msg.lower() or 'already been registered' in msg.lower():
-        return 'An account with this email already exists — try signing in'
-    if 'password should be at least' in msg.lower():
-        return 'Password too short (Supabase default is 6 characters)'
-    return msg
+        logger.error(f"Failed to delete analysis: {exc}")
+        return False
