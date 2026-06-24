@@ -34,18 +34,26 @@ def _get_headers():
 def google_oauth_url():
     url, key = _get_supabase_config()
 
-    redirect = os.environ.get(
-        "AUTH_REDIRECT_URL",
-        "https://atsscorer-k9xrzsqzqqkuvtgph4wiqp.streamlit.app"
-    )
+    if not url or not key:
+        return {"error": "Supabase not configured"}
 
-    return {
-        "url":
-        f"{url}/auth/v1/authorize"
-        f"?provider=google"
-        f"&redirect_to={redirect}"
-        f"&flow_type=pkce"
-    }
+    try:
+        # Read from Streamlit secrets first
+        try:
+            redirect = st.secrets["AUTH_REDIRECT_URL"]
+        except Exception:
+            redirect = "https://atsscorer-k9xrzsqzqqkuvtgph4wiqp.streamlit.app"
+
+        auth_url = (
+            f"{url.rstrip('/')}/auth/v1/authorize"
+            f"?provider=google"
+            f"&redirect_to={redirect}"
+        )
+
+        print("OAuth URL:", auth_url)
+
+    except Exception as exc:
+        return {"error": str(exc)}
 
 def sign_in_with_password(email: str, password: str) -> dict:
     url, key = _get_supabase_config()
