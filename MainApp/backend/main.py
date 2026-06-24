@@ -13,7 +13,7 @@ from MainApp.backend.core.config import (
     SPACY_MODEL_SECONDARY,
 )
 
-from api.routes import router
+from MainApp.backend.api.routes import router
 
 logger = logging.getLogger("ats_resume_scorer")
 
