@@ -5,16 +5,18 @@ import os
 from datetime import datetime, timezone
 from typing import List, Optional, Dict
 import streamlit as st
+from dotenv import load_dotenv
+load_dotenv()
 
 logger = logging.getLogger('ats_resume_scorer')
 
 def _get_supabase_config():
     try:
         url = st.secrets["SUPABASE_URL"]
-        key = st.secrets["SUPABASE_KEY"]
+        key = st.secrets.get("SUPABASE_KEY") or st.secrets.get("SUPABASE_ANON_KEY")
     except:
         url = os.environ.get("SUPABASE_URL", "")
-        key = os.environ.get("SUPABASE_KEY", "")
+        key = os.environ.get("SUPABASE_KEY") or os.environ.get("SUPABASE_ANON_KEY", "")
     return url, key
 
 def _get_headers():
