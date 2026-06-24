@@ -3,13 +3,10 @@ from pathlib import Path
 import sys
 import os
 
-# Add the repo root to sys.path so `from MainApp.xxx import yyy` resolves,
-# regardless of where Streamlit Cloud mounts the repo.
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from MainApp.frontend.services import supabase_client
 
-# Configure page
 st.set_page_config(
     page_title="ATS Resume Scorer",
     page_icon="🎯",
@@ -17,7 +14,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Auth state. Populated by Supabase sign-in / sign-up / OAuth.
 for key, default in [
     ("access_token", None),
     ("refresh_token", None),
@@ -29,23 +25,29 @@ for key, default in [
     if key not in st.session_state:
         st.session_state[key] = default
 
-# If we just came back from Google OAuth, exchange the code for a session.
-if (
-    not st.session_state.access_token
-    and "code" in st.query_params
-):
+def _extract_user(result):
+    user = result.get("user") or {}
+    if isinstance(user, dict):
+        uid = user.get("id", "")
+        email = user.get("email", "")
+    else:
+        uid = getattr(user, "id", "")
+        email = getattr(user, "email", "")
+    return uid, email
+
+if not st.session_state.access_token and "code" in st.query_params:
     result = supabase_client.exchange_code_for_session(st.query_params["code"])
     st.query_params.clear()
     if "error" in result:
         st.session_state.auth_error = f"Google sign-in failed: {result['error']}"
     else:
-        st.session_state.access_token  = result["access_token"]
-        st.session_state.refresh_token = result["refresh_token"]
-        st.session_state.user_id       = result["user_id"]
-        st.session_state.user_email    = result["email"]
+        st.session_state.access_token = result.get("access_token")
+        st.session_state.refresh_token = result.get("refresh_token")
+        uid, email = _extract_user(result)
+        st.session_state.user_id = uid
+        st.session_state.user_email = email
         st.rerun()
 
-# Load custom CSS
 def load_css():
     try:
         css_path = Path(__file__).parent / 'assets' / 'styles.css'
@@ -56,11 +58,9 @@ def load_css():
 
 st.markdown(load_css(), unsafe_allow_html=True)
 
-# Initialize session state for view management
 if 'current_view' not in st.session_state:
     st.session_state.current_view = 'landing'
 
-# Sidebar navigation
 with st.sidebar:
     st.markdown("## Navigation")
 
@@ -86,7 +86,7 @@ with st.sidebar:
     if st.session_state.access_token:
         st.caption(f"Signed in as **{st.session_state.user_email}**")
         if st.button("Sign out", use_container_width=True):
-            supabase_client.sign_out()
+            supabase_client.sign_out(st.session_state.access_token)
             for k in ("access_token", "refresh_token", "user_id", "user_email"):
                 st.session_state[k] = None
             st.rerun()
@@ -110,11 +110,12 @@ with st.sidebar:
                 if "error" in result:
                     st.session_state.auth_error = result["error"]
                 else:
-                    st.session_state.access_token  = result["access_token"]
-                    st.session_state.refresh_token = result["refresh_token"]
-                    st.session_state.user_id = result.get("user_id") or result.get("user", {}).get("id", "")
-                    st.session_state.user_email    = result["email"]
-                st.rerun()
+                    st.session_state.access_token = result.get("access_token")
+                    st.session_state.refresh_token = result.get("refresh_token")
+                    uid, email = _extract_user(result)
+                    st.session_state.user_id = uid
+                    st.session_state.user_email = email
+                    st.rerun()
 
         with tab_up:
             with st.form("signup_form", clear_on_submit=False):
@@ -127,13 +128,14 @@ with st.sidebar:
                     st.session_state.auth_error = result["error"]
                 elif result.get("pending_confirmation"):
                     st.session_state.auth_info = (
-                        f"Check your inbox — confirmation email sent to {result['email']}."
+                        f"Check your inbox — confirmation email sent to {email_up}."
                     )
                 else:
-                    st.session_state.access_token  = result["access_token"]
-                    st.session_state.refresh_token = result["refresh_token"]
-                    st.session_state.user_id       = result["user_id"]
-                    st.session_state.user_email    = result["email"]
+                    st.session_state.access_token = result.get("access_token")
+                    st.session_state.refresh_token = result.get("refresh_token")
+                    uid, email_up = _extract_user(result)
+                    st.session_state.user_id = uid
+                    st.session_state.user_email = email_up
                 st.rerun()
 
         st.markdown("<div style='text-align:center; margin: 8px 0; color:#94a3b8;'>or</div>",
@@ -149,7 +151,6 @@ with st.sidebar:
                 use_container_width=True,
             )
 
-# Main content area - render based on current view
 if st.session_state.current_view == 'landing':
     from MainApp.frontend.views import landing
     landing.render()
