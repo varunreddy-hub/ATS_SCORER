@@ -4,7 +4,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sentence_transformers import SentenceTransformer
 from MainApp.backend.core.config import SENTENCE_TRANSFORMER_MODEL
-from api.auth import get_current_user
+from MainApp.backend.api.auth import get_current_user
 from MainApp.backend.models.schemas import AnalysisResponse, ComponentScores, JDComparison, SkillValidationDetails
 from MainApp.backend.utils.file_utils import (
     get_default_grammar_results,
@@ -125,7 +125,7 @@ async def analyze_resume(
 
 
     try:
-        from database.supabase_db import save_analysis
+        from MainApp.backend.database.supabase_db import save_analysis
         await save_analysis(user_id, filename, result)
     except Exception as exc:
         logger.warning(f'History save failed (non-blocking): {exc}')
@@ -145,7 +145,7 @@ async def health_check(request: Request):
 @router.get('/history')
 async def get_history(user_id: str = Depends(get_current_user)):
     """Return the signed-in user's past analyses (identity comes from the JWT)."""
-    from database.supabase_db import get_user_history
+    from MainApp.backend.database.supabase_db import get_user_history
     try:
         return await get_user_history(user_id)
     except Exception as exc:
@@ -202,7 +202,7 @@ async def generate_history_pdf(
     analysis_id: str,
     user_id: str = Depends(get_current_user),
 ):
-    from database.supabase_db import get_user_history
+    from MainApp.backend.database.supabase_db import get_user_history
     from MainApp.backend.services.report_generator import generate_html_reports
     from MainApp.backend.services.pdf_export import generate_combined_pdf
     from fastapi.responses import Response
