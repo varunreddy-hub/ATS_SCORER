@@ -1,7 +1,7 @@
 
 import re
 from typing import List, Dict, Any, Optional
-from models.schemas import IssueDetail
+from MainApp.backend.models.schemas import IssueDetail
 
 def analyze_issues(
         resume_text: str, 

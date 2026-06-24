@@ -3,9 +3,9 @@ import spacy
 import numpy as np
 from typing import Dict, List, Optional, Tuple
 
-from utils.file_utils import log_warning
-from core.config import SENTENCE_TRANSFORMER_MODEL
-from utils.matching import fuzzy_match_keywords
+from MainApp.backend.utils.file_utils import log_warning
+from MainApp.backend.core.config import SENTENCE_TRANSFORMER_MODEL
+from MainApp.backend.utils.matching import fuzzy_match_keywords
 
 ZIP_CODE_PATTERN = r'\b\d{5}(?:-\d{4})?\b'
 

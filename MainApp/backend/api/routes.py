@@ -3,10 +3,10 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from sentence_transformers import SentenceTransformer
-from core.config import SENTENCE_TRANSFORMER_MODEL
+from MainApp.backend.core.config import SENTENCE_TRANSFORMER_MODEL
 from api.auth import get_current_user
-from models.schemas import AnalysisResponse, ComponentScores, JDComparison, SkillValidationDetails
-from utils.file_utils import (
+from MainApp.backend.models.schemas import AnalysisResponse, ComponentScores, JDComparison, SkillValidationDetails
+from MainApp.backend.utils.file_utils import (
     get_default_grammar_results,
     get_default_location_results,
     get_default_skill_validation_results,
@@ -49,7 +49,7 @@ async def analyze_resume(
         file_bytes = await resume.read()
         filename   = resume.filename or 'resume'
 
-        from services.resume_parser import (
+        from MainApp.backend.services.resume_parser import (
             FileParsingError,
             FileValidationError,
             parse_resume_file,
@@ -67,7 +67,7 @@ async def analyze_resume(
 
     #Full Analysis Pipeline 
     try:
-        from services.resume_analyzer import analyze_full_resume
+        from MainApp.backend.services.resume_analyzer import analyze_full_resume
         
         result = analyze_full_resume(
             resume_text=resume_text,
@@ -79,7 +79,7 @@ async def analyze_resume(
         logger.error(f'Full analysis pipeline failed: {exc}')
         raise HTTPException(status_code=500, detail=f'Analysis pipeline failed: {exc}')
 
-    from models.schemas import ComponentScores
+    from MainApp.backend.models.schemas import ComponentScores
 
     #Extract jd_comparison details
     jd_comparison_result = None
@@ -177,8 +177,8 @@ async def generate_pdf(
     data: AnalysisResponse,
     user_id: str = Depends(get_current_user),
 ):
-    from services.report_generator import generate_html_reports
-    from services.pdf_export import generate_combined_pdf
+    from MainApp.backend.services.report_generator import generate_html_reports
+    from MainApp.backend.services.pdf_export import generate_combined_pdf
     from fastapi.responses import Response
 
     try:
@@ -203,8 +203,8 @@ async def generate_history_pdf(
     user_id: str = Depends(get_current_user),
 ):
     from database.supabase_db import get_user_history
-    from services.report_generator import generate_html_reports
-    from services.pdf_export import generate_combined_pdf
+    from MainApp.backend.services.report_generator import generate_html_reports
+    from MainApp.backend.services.pdf_export import generate_combined_pdf
     from fastapi.responses import Response
 
     history = await get_user_history(user_id)

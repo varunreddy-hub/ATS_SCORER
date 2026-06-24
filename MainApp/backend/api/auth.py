@@ -3,7 +3,7 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from core.config import SUPABASE_JWT_SECRET, SUPABASE_URL
+from MainApp.backend.core.config import SUPABASE_JWT_SECRET, SUPABASE_URL
 
 logger = logging.getLogger('ats_resume_scorer')
 

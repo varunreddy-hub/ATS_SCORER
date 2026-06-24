@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from core.config import (
+from MainApp.backend.core.config import (
     ALLOWED_ORIGINS,
     APP_DESCRIPTION,
     APP_TITLE,
