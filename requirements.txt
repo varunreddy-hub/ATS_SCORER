@@ -3,10 +3,10 @@ supabase
 requests
 python-dotenv
 spacy==3.8.13
-
 sentence-transformers
 transformers
 torch
+groq
 pdfplumber
 python-docx
 PyPDF2
