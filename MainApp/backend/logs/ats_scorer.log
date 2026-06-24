@@ -307,3 +307,4 @@
 2026-06-24 22:44:26,188 - INFO - Successfully loaded en_core_web_sm
 2026-06-24 22:44:26,188 - INFO - SentenceTransformer lazy loading enabled
 2026-06-24 22:44:26,188 - INFO - API startup completed.
+2026-06-24 22:49:23,739 - INFO - Shutting down ATS Resume Analyzer API...

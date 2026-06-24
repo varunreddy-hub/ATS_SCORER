@@ -162,11 +162,7 @@ with st.sidebar:
         if "error" in oauth:
             st.caption(f"Google sign-in unavailable: {oauth['error']}")
         else:
-            st.link_button(
-                "Continue with Google",
-                url=oauth["url"],
-                use_container_width=True,
-            )
+            st.write(oauth["url"])
 
 if st.session_state.current_view == 'landing':
     from MainApp.frontend.views import landing
