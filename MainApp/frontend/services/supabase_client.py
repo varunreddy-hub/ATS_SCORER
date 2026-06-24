@@ -17,6 +17,7 @@ def _get_supabase_config():
         url = os.environ.get("SUPABASE_URL", "")
         key = os.environ.get("SUPABASE_KEY", "")
     return url, key
+
 def google_oauth_url() -> dict:
     url, key = _get_supabase_config()
     if not url or not key:
@@ -41,6 +42,91 @@ def google_oauth_url() -> dict:
     except Exception as exc:
         logger.error(f"OAuth URL error: {exc}")
         return {"error": str(exc)}
+    
+def sign_in_with_password(email: str, password: str) -> dict:
+    url, key = _get_supabase_config()
+    if not url or not key:
+        return {"error": "Supabase not configured"}
+    try:
+        response = httpx.post(
+            f"{url.rstrip('/')}/auth/v1/token?grant_type=password",
+            headers={"apikey": key, "Content-Type": "application/json"},
+            json={"email": email, "password": password}
+        )
+        data = response.json()
+        if "error" in data or "error_description" in data:
+            return {"error": data.get("error_description", data.get("error"))}
+        return {
+            "user": data.get("user"),
+            "access_token": data.get("access_token"),
+            "refresh_token": data.get("refresh_token")
+        }
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+def sign_up(email: str, password: str) -> dict:
+    url, key = _get_supabase_config()
+    if not url or not key:
+        return {"error": "Supabase not configured"}
+    try:
+        response = httpx.post(
+            f"{url.rstrip('/')}/auth/v1/signup",
+            headers={"apikey": key, "Content-Type": "application/json"},
+            json={"email": email, "password": password}
+        )
+        data = response.json()
+        if "error" in data:
+            return {"error": data.get("error_description", data.get("error"))}
+        return {"user": data.get("user")}
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+def sign_out(access_token: str) -> dict:
+    url, key = _get_supabase_config()
+    if not url or not key:
+        return {"error": "Supabase not configured"}
+    try:
+        httpx.post(
+            f"{url.rstrip('/')}/auth/v1/logout",
+            headers={"apikey": key, "Authorization": f"Bearer {access_token}"}
+        )
+        return {"success": True}
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+def get_user(access_token: str) -> dict:
+    url, key = _get_supabase_config()
+    if not url or not key:
+        return {"error": "Supabase not configured"}
+    try:
+        response = httpx.get(
+            f"{url.rstrip('/')}/auth/v1/user",
+            headers={"apikey": key, "Authorization": f"Bearer {access_token}"}
+        )
+        data = response.json()
+        if "error" in data:
+            return {"error": data.get("error_description", data.get("error"))}
+        return {"user": data}
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+def google_oauth_url() -> dict:
+    url, key = _get_supabase_config()
+    if not url or not key:
+        return {"error": "Supabase not configured"}
+    try:
+        import os
+        redirect = os.environ.get("AUTH_REDIRECT_URL", "http://localhost:8501")
+        auth_url = f"{url.rstrip('/')}/auth/v1/authorize?provider=google&redirect_to={redirect}"
+        return {"url": auth_url}
+    except Exception as exc:
+        return {"error": str(exc)}
+    
+
 def _get_headers():
     url, key = _get_supabase_config()
     if not url or not key:
