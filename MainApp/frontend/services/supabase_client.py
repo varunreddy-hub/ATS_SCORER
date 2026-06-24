@@ -41,7 +41,6 @@ def google_oauth_url() -> dict:
             f"{url.rstrip('/')}/auth/v1/authorize"
             f"?provider=google"
             f"&redirect_to={redirect}"
-            f"&flow_type=pkce"
         )
         return {"url": auth_url}
     except Exception as exc:

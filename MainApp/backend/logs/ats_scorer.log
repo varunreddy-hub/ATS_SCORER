@@ -273,3 +273,26 @@
 2026-06-24 18:41:59,665 - INFO - SentenceTransformer lazy loading enabled
 2026-06-24 18:41:59,665 - INFO - API startup completed.
 2026-06-24 19:23:54,172 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-24 19:24:16,330 - INFO - Starting ATS Resume Analyzer API...
+2026-06-24 19:24:17,262 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-24 19:24:17,778 - INFO - Successfully loaded en_core_web_sm
+2026-06-24 19:24:17,778 - INFO - SentenceTransformer lazy loading enabled
+2026-06-24 19:24:17,778 - INFO - API startup completed.
+2026-06-24 21:19:54,289 - INFO - Starting ATS Resume Analyzer API...
+2026-06-24 21:19:59,598 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-24 21:20:01,006 - INFO - Successfully loaded en_core_web_sm
+2026-06-24 21:20:01,006 - INFO - SentenceTransformer lazy loading enabled
+2026-06-24 21:20:01,006 - INFO - API startup completed.
+2026-06-24 22:28:15,353 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-24 22:28:42,645 - INFO - Starting ATS Resume Analyzer API...
+2026-06-24 22:28:44,331 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-24 22:28:45,103 - INFO - Successfully loaded en_core_web_sm
+2026-06-24 22:28:45,103 - INFO - SentenceTransformer lazy loading enabled
+2026-06-24 22:28:45,103 - INFO - API startup completed.
+2026-06-24 22:28:45,207 - INFO - Shutting down ATS Resume Analyzer API...
+2026-06-24 22:28:59,576 - INFO - Starting ATS Resume Analyzer API...
+2026-06-24 22:29:00,919 - INFO - Loading spaCy model: en_core_web_sm
+2026-06-24 22:29:01,637 - INFO - Successfully loaded en_core_web_sm
+2026-06-24 22:29:01,640 - INFO - SentenceTransformer lazy loading enabled
+2026-06-24 22:29:01,640 - INFO - API startup completed.
+2026-06-24 22:40:17,174 - INFO - Shutting down ATS Resume Analyzer API...

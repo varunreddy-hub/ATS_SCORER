@@ -13,7 +13,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
+st.write("Query Params:", dict(st.query_params))
 for key, default in [
     ("access_token", None),
     ("refresh_token", None),
