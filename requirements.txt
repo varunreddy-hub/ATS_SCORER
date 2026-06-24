@@ -14,7 +14,7 @@ rapidfuzz
 pdfplumber
 python-docx
 PyPDF2
-
+torchvision
 numpy
 pandas
 scikit-learn

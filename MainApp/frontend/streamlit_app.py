@@ -112,7 +112,7 @@ with st.sidebar:
                 else:
                     st.session_state.access_token  = result["access_token"]
                     st.session_state.refresh_token = result["refresh_token"]
-                    st.session_state.user_id       = result["user_id"]
+                    st.session_state.user_id = result.get("user_id") or result.get("user", {}).get("id", "")
                     st.session_state.user_email    = result["email"]
                 st.rerun()
 
