@@ -74,3 +74,4 @@ def display_detailed_feedback(analysis: Dict[str, Any]) -> None:
         st.markdown(f"#### {level.title()} ({len(items)})")
         for issue in items:
             _render_issue(issue)
+    
